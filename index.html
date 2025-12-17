@@ -29,15 +29,13 @@
             --glass-border: rgba(220, 38, 38, 0.5);
         }
 
-               body {
+        body {
             font-family: 'Inter', sans-serif;
             background-color: #030712;
             color: white;
             overflow-x: hidden;
             transition: all 0.5s ease;
         }
-
-
 
         h1, h2, .brand-font { font-family: 'Poppins', sans-serif; }
 
@@ -76,6 +74,7 @@
             position: absolute; top: 0; left: 0;
             animation: scan 3s linear infinite;
             pointer-events: none;
+            z-index: 50; /* Ensure scanline is above but doesn't block clicks */
         }
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
@@ -84,6 +83,9 @@
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.2s;
             text-align: left;
+            cursor: pointer; /* Ensure cursor changes */
+            position: relative; 
+            z-index: 30; /* Ensure clickable */
         }
         .option-btn:hover {
             background: rgba(255,255,255,0.1);
@@ -136,6 +138,12 @@
             h2 { font-size: 1.125rem; }
             .option-btn { padding: 0.75rem; font-size: 0.875rem; }
         }
+        
+        /* Ensure Inputs are clickable */
+        input, button {
+            position: relative;
+            z-index: 40;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
@@ -155,9 +163,8 @@
             </div>
         </div>
 
-        <!-- HOME SCREEN -->
         <div id="screen-home" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 text-center fade-in z-20">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-2 tracking-tighter">SIMULATION_READY</h1 style="font-family: sans-serif">
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2 tracking-tighter" style="font-family: sans-serif">SIMULATION_READY</h1>
             <p class="text-gray-400 mb-6 sm:mb-8 text-xs sm:text-sm">Initialize Neural Security Training</p>
 
             <div class="w-full space-y-4 sm:space-y-6">
@@ -171,15 +178,14 @@
                 </div>
 
                 <input type="text" id="username-input" placeholder="CODENAME" 
-                    class="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-black/40 border border-white/10 text-center text-lg sm:text-xl tracking-widest text-white focus:border-cyan-400 outline-none transition">
+                    class="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-black/40 border border-white/10 text-center text-lg sm:text-xl tracking-widest text-white focus:border-cyan-400 outline-none transition z-30">
                 
-                <button onclick="initiateSequence()" class="w-full bg-white text-black font-bold py-3 sm:py-4 rounded-lg hover:bg-gray-200 transition-colors duration-300 brand-font tracking-wider text-sm sm:text-base">
+                <button id="start-btn" class="w-full bg-white text-black font-bold py-3 sm:py-4 rounded-lg hover:bg-gray-200 transition-colors duration-300 brand-font tracking-wider text-sm sm:text-base cursor-pointer z-30">
                     ESTABLISH UPLINK
                 </button>
             </div>
         </div>
 
-        <!-- LOADING SCREEN -->
         <div id="screen-loading" class="hidden flex-1 flex flex-col items-center justify-center p-4 sm:p-8 text-center fade-in z-20">
             <div class="text-4xl sm:text-5xl mb-4 animate-spin text-cyan-400"><i class="ri-loader-5-line"></i></div>
             <h2 class="text-base sm:text-lg font-bold mb-2">GENERATING SCENARIOS</h2>
@@ -187,9 +193,7 @@
             <div class="mt-4 text-xs text-gray-600" id="topic-tag">Topic: Loading...</div>
         </div>
 
-        <!-- GAME SCREEN -->
-        <div id="screen-game" class="hidden flex-1 flex flex-col p-3 sm:p-6 fade-in h-full pt-16 sm:pt-20">
-            <!-- Stats Bar -->
+        <div id="screen-game" class="hidden flex-1 flex flex-col p-3 sm:p-6 fade-in h-full pt-16 sm:pt-20 z-20">
             <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
                 <div class="bg-white/5 border border-white/10 rounded-lg p-2 sm:p-4 text-center">
                     <div class="text-xs text-gray-500 mb-1">SCORE</div>
@@ -205,26 +209,21 @@
                 </div>
             </div>
 
-            <!-- Progress Bar -->
             <div class="progress-bar mb-4">
                 <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
             </div>
 
-            <!-- Scenario Text -->
             <div class="mb-4 sm:mb-6 flex-1">
                 <div class="text-xs text-gray-500 mb-2 uppercase tracking-widest">Scenario <span id="q-number">1</span>/20</div>
                 <h2 id="scenario-text" class="text-base sm:text-xl font-bold leading-relaxed text-gray-100">
                 </h2>
             </div>
 
-            <!-- Options -->
             <div id="options-container" class="flex flex-col gap-2 sm:gap-3 mt-auto">
             </div>
         </div>
 
-        <!-- RESULT SCREEN -->
-        <div id="screen-result" class="hidden flex-1 flex flex-col p-0 fade-in h-full overflow-hidden">
-            <!-- Score Section -->
+        <div id="screen-result" class="hidden flex-1 flex flex-col p-0 fade-in h-full overflow-hidden z-20">
             <div class="px-4 sm:px-6 py-4 sm:py-8 text-center bg-gradient-to-b from-white/5 to-transparent">
                 <h2 class="text-xs text-gray-500 uppercase tracking-widest mb-2">Mission Debrief</h2>
                 <div id="final-score" class="text-5xl sm:text-7xl font-black text-white mb-2 brand-font">0</div>
@@ -232,7 +231,6 @@
                 <div id="score-details" class="text-xs sm:text-sm text-gray-400"></div>
             </div>
 
-            <!-- Chat Section -->
             <div class="flex-1 bg-black/50 border-t border-white/10 flex flex-col relative overflow-hidden">
                 <div class="p-3 border-b border-white/5 flex justify-between bg-white/5 text-xs sticky top-0">
                     <span class="flex items-center gap-2"><i class="ri-robot-line"></i> TechAura Analysis</span>
@@ -251,91 +249,121 @@
     </div>
 
     <script>
-        // --- CONFIG ---
-        const SUPABASE_URL = 'https://hmurtzrapeudgcvnfszb.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdXJ0enJhcGV1ZGdjdm5mc3piIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjU0MjYsImV4cCI6MjA4MDk0MTQyNn0._6sZ3wjfqtdwgF9NTiF4PkBkMkIeSNvg0EDOYwh8YBM';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        const TOPICS = [
-            "Corporate Phishing", "Deepfake Audio", "Ransomware Negotiation", 
-            "Public Wi-Fi Attacks", "Physical Tailgating", "USB Drops", 
-            "IoT Camera Hacking", "Social Engineering Calls", "Password Managers", "2FA Fatigue"
-        ];
-
-        let state = {
-            username: "Guest",
-            groqKey: null,
-            score: 0,
-            timer: 60,
-            qIndex: 0,
-            interval: null,
-            questions: [],
-            isHackerMode: false,
-            chatContext: [],
-            answers: [],
-            startTime: null
-        };
-
-        const els = {
-            screens: { home: document.getElementById('screen-home'), loading: document.getElementById('screen-loading'), game: document.getElementById('screen-game'), result: document.getElementById('screen-result') },
-            input: document.getElementById('username-input'),
-            toggle: document.getElementById('hacker-toggle'),
-            modeBadge: document.getElementById('mode-badge'),
-            scenarioText: document.getElementById('scenario-text'),
-            optionsBox: document.getElementById('options-container'),
-            loadingTopic: document.getElementById('topic-tag')
-        };
-
-        els.toggle.addEventListener('change', (e) => {
-            state.isHackerMode = e.target.checked;
-            if(state.isHackerMode) {
-                document.body.classList.add('hacker-mode');
-                els.modeBadge.innerText = "HACKER";
-                els.modeBadge.className = "px-2 py-1 rounded text-xs border border-red-500 text-red-500 font-bold tracking-widest";
-            } else {
-                document.body.classList.remove('hacker-mode');
-                els.modeBadge.innerText = "SECURE";
-                els.modeBadge.className = "px-2 py-1 rounded text-xs border border-cyan-500 text-cyan-400 font-bold tracking-widest";
-            }
-        });
-
-        (async function init() {
-            try {
-                const { data } = await supabase.from('app_config').select('key_value').eq('key_name', 'groq_api_key').single();
-                if(data) state.groqKey = data.key_value;
-            } catch(e) { console.error("DB Error", e); }
-        })();
-
-        function show(id) {
-            Object.values(els.screens).forEach(el => el.classList.add('hidden'));
-            els.screens[id].classList.remove('hidden');
-        }
-
-        async function initiateSequence() {
-            if(!els.input.value.trim()) return els.input.focus();
-            state.username = els.input.value.trim();
-            state.answers = [];
-            show('loading');
-
-            const t1 = TOPICS[Math.floor(Math.random() * TOPICS.length)];
-            const t2 = TOPICS[Math.floor(Math.random() * TOPICS.length)];
-            els.loadingTopic.innerText = `Focus: ${t1} & ${t2}`;
-
-            await generateScenarios(t1, t2);
-            startGame();
-        }
-
-        async function generateScenarios(t1, t2) {
-            if(!state.groqKey) {
-                console.error("No API key available");
-                alert("API key not configured. Please check your Supabase setup.");
-                show('home');
-                return;
-            }
-
-            const difficulty = state.isHackerMode ? 'EXPERT' : 'INTERMEDIATE';
+        // Wait for DOM and libraries to load to prevent "cannot click" errors
+        document.addEventListener('DOMContentLoaded', () => {
             
-            const prompt = `Create 20 ${difficulty} cybersecurity quiz questions about ${t1} and ${t2}.
+            // --- CONFIG ---
+            // If you have your own Groq Key, replace null below: "gsk_..."
+            // If you leave it null, the app will ask you for it.
+            let userApiKey = null; 
+
+            // Initialize DB only if available
+            const SUPABASE_URL = 'https://hmurtzrapeudgcvnfszb.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdXJ0enJhcGV1ZGdjdm5mc3piIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjU0MjYsImV4cCI6MjA4MDk0MTQyNn0._6sZ3wjfqtdwgF9NTiF4PkBkMkIeSNvg0EDOYwh8YBM';
+            
+            let supabase = null;
+            if(window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.error("Supabase library not loaded.");
+            }
+
+            const TOPICS = [
+                "Corporate Phishing", "Deepfake Audio", "Ransomware Negotiation", 
+                "Public Wi-Fi Attacks", "Physical Tailgating", "USB Drops", 
+                "IoT Camera Hacking", "Social Engineering Calls", "Password Managers", "2FA Fatigue"
+            ];
+
+            let state = {
+                username: "Guest",
+                groqKey: userApiKey,
+                score: 0,
+                timer: 60,
+                qIndex: 0,
+                interval: null,
+                questions: [],
+                isHackerMode: false,
+                chatContext: [],
+                answers: [],
+                startTime: null
+            };
+
+            const els = {
+                screens: { home: document.getElementById('screen-home'), loading: document.getElementById('screen-loading'), game: document.getElementById('screen-game'), result: document.getElementById('screen-result') },
+                input: document.getElementById('username-input'),
+                toggle: document.getElementById('hacker-toggle'),
+                modeBadge: document.getElementById('mode-badge'),
+                scenarioText: document.getElementById('scenario-text'),
+                optionsBox: document.getElementById('options-container'),
+                loadingTopic: document.getElementById('topic-tag'),
+                startBtn: document.getElementById('start-btn')
+            };
+
+            // Bind click event manually to ensure it works
+            els.startBtn.addEventListener('click', initiateSequence);
+
+            els.toggle.addEventListener('change', (e) => {
+                state.isHackerMode = e.target.checked;
+                if(state.isHackerMode) {
+                    document.body.classList.add('hacker-mode');
+                    els.modeBadge.innerText = "HACKER";
+                    els.modeBadge.className = "px-2 py-1 rounded text-xs border border-red-500 text-red-500 font-bold tracking-widest";
+                } else {
+                    document.body.classList.remove('hacker-mode');
+                    els.modeBadge.innerText = "SECURE";
+                    els.modeBadge.className = "px-2 py-1 rounded text-xs border border-cyan-500 text-cyan-400 font-bold tracking-widest";
+                }
+            });
+
+            // Try to fetch config, but don't crash if it fails
+            (async function init() {
+                if(!state.groqKey && supabase) {
+                    try {
+                        const { data } = await supabase.from('app_config').select('key_value').eq('key_name', 'groq_api_key').single();
+                        if(data) state.groqKey = data.key_value;
+                    } catch(e) { console.log("Could not fetch key from DB. Using manual entry."); }
+                }
+            })();
+
+            window.show = function(id) {
+                Object.values(els.screens).forEach(el => el.classList.add('hidden'));
+                els.screens[id].classList.remove('hidden');
+            }
+
+            async function initiateSequence() {
+                if(!els.input.value.trim()) {
+                    els.input.classList.add('border-red-500');
+                    setTimeout(() => els.input.classList.remove('border-red-500'), 500);
+                    return els.input.focus();
+                }
+                
+                state.username = els.input.value.trim();
+                state.answers = [];
+
+                // API Key Check
+                if(!state.groqKey) {
+                    const key = prompt("Database connection failed (Expected). Please enter a Groq API Key to play (starts with gsk_...):");
+                    if(key) state.groqKey = key;
+                    else {
+                        alert("API Key is required to generate scenarios.");
+                        return;
+                    }
+                }
+
+                show('loading');
+
+                const t1 = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+                const t2 = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+                els.loadingTopic.innerText = `Focus: ${t1} & ${t2}`;
+
+                await generateScenarios(t1, t2);
+                startGame();
+            }
+
+            async function generateScenarios(t1, t2) {
+                const difficulty = state.isHackerMode ? 'EXPERT' : 'INTERMEDIATE';
+                
+                const promptText = `Create 20 ${difficulty} cybersecurity quiz questions about ${t1} and ${t2}.
 
 For each question:
 1. Write a scenario
@@ -351,304 +379,218 @@ ${state.isHackerMode ? 'Expert: Very tricky, similar options, requires deep know
 
 Make all text short. Return ONLY the JSON array.`;
 
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: { 
-                        "Authorization": `Bearer ${state.groqKey}`, 
-                        "Content-Type": "application/json" 
-                    },
-                    body: JSON.stringify({
-                        messages: [{ role: "user", content: prompt }],
-                        model: "llama-3.3-70b-versatile",
-                        temperature: 0.7,
-                        max_tokens: 2000
-                    })
-                });
-
-                if(!res.ok) {
-                    const errorData = await res.json();
-                    console.error("API Error:", errorData);
-                    alert("Error generating scenarios: " + (errorData.error?.message || "Unknown error"));
-                    show('home');
-                    return;
-                }
-
-                const json = await res.json();
-                let content = json.choices[0].message.content;
-                
-                // Clean up JSON response
-                content = content.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                // Remove problematic characters
-                content = content.replace(/[\r\n\t]/g, ' ');
-                content = content.replace(/\s+/g, ' ');
-                
-                // Fix common JSON issues
-                content = content.replace(/,\s*}/g, '}'); // Remove trailing commas
-                content = content.replace(/,\s*]/g, ']'); // Remove trailing commas in arrays
-                content = content.replace(/:\s*'/g, ':"'); // Replace single quotes with double
-                content = content.replace(/'\s*,/g, '",'); // End quoted strings properly
-                content = content.replace(/"\s*"/g, '"'); // Remove duplicate quotes
-                
-                // Escape unescaped quotes in strings
-                content = content.replace(/": "([^"]*)"([^"]*?)"/g, '": "$1\\"$2"');
-                
-                let parsed;
                 try {
-                    parsed = JSON.parse(content);
-                } catch(parseErr) {
-                    console.log("Failed to parse, attempting extraction...");
-                    // Extract just the array
-                    const arrayMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if(arrayMatch) {
-                        let arrayStr = arrayMatch[0];
-                        // Remove any text before [ or after ]
-                        arrayStr = arrayStr.substring(arrayStr.indexOf('['), arrayStr.lastIndexOf(']') + 1);
-                        parsed = JSON.parse(arrayStr);
-                    } else {
-                        throw new Error("Could not extract valid JSON from response: " + parseErr.message);
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { 
+                            "Authorization": `Bearer ${state.groqKey}`, 
+                            "Content-Type": "application/json" 
+                        },
+                        body: JSON.stringify({
+                            messages: [{ role: "user", content: promptText }],
+                            model: "llama-3.3-70b-versatile",
+                            temperature: 0.7,
+                            max_tokens: 2000
+                        })
+                    });
+
+                    if(!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.error?.message || "Unknown error");
                     }
+
+                    const json = await res.json();
+                    let content = json.choices[0].message.content;
+                    
+                    // JSON Cleaning Logic
+                    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                    content = content.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ');
+                    
+                    // Fallback parser
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(content);
+                    } catch(e) {
+                        const arrayMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                        if(arrayMatch) parsed = JSON.parse(arrayMatch[0]);
+                        else throw new Error("JSON Parse failed");
+                    }
+                    
+                    if(!Array.isArray(parsed) || parsed.length < 5) throw new Error("Not enough questions generated");
+                    
+                    // Normalize data
+                    parsed.forEach((q, idx) => {
+                        if(!q.options || q.options.length !== 3) q.options = ["Opt A", "Opt B", "Opt C"];
+                        if(typeof q.correctIndex !== 'number') q.correctIndex = 0;
+                        if(!q.explanation) q.explanation = "Check security protocols.";
+                    });
+                    
+                    state.questions = parsed.slice(0, 20);
+                } catch(e) {
+                    console.error("Generation Error", e);
+                    alert("Error generating scenarios: " + e.message + "\n\nCheck your API Key.");
+                    show('home');
+                    throw e; // Stop execution
                 }
-                
-                if(!Array.isArray(parsed) || parsed.length !== 20) {
-                    throw new Error(`Expected 20 scenarios, got ${parsed.length}`);
-                }
-                
-                parsed.forEach((q, idx) => {
-                    if(!q.q || !Array.isArray(q.options) || q.options.length !== 3 || q.correctIndex === undefined) {
-                        throw new Error(`Scenario ${idx} has invalid structure`);
-                    }
-                    // Validate correctIndex is within range
-                    if(typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 2) {
-                        q.correctIndex = 0; // Fallback to first option
-                    }
-                    // Ensure explanation exists
-                    if(!q.explanation) {
-                        q.explanation = `Option ${String.fromCharCode(65 + q.correctIndex)} is the correct answer.`;
-                    }
-                });
-                
-                // Double-check we got valid questions
-                if(parsed.length < 20) {
-                    throw new Error(`Only got ${parsed.length} questions, need 20`);
-                }
-                
-                state.questions = parsed;
-            } catch(e) {
-                console.error("Generation Error", e);
-                alert("Error generating scenarios: " + e.message);
-                show('home');
             }
-        }
 
-        function startGame() {
-            if(!state.questions || state.questions.length === 0) {
-                alert("Failed to load scenarios. Please try again.");
-                show('home');
-                return;
-            }
+            function startGame() {
+                if(!state.questions || state.questions.length === 0) return;
 
-            state.score = 0;
-            state.qIndex = 0;
-            state.timer = state.isHackerMode ? 30 : 60;
-            state.startTime = Date.now();
-            
-            document.getElementById('score-display').innerText = "0";
-            document.getElementById('timer-display').innerText = state.timer + "s";
-            document.getElementById('progress-display').innerText = "1/20";
-            
-            show('game');
-            renderQ();
-
-            state.interval = setInterval(() => {
-                state.timer--;
+                state.score = 0;
+                state.qIndex = 0;
+                state.timer = state.isHackerMode ? 30 : 60;
+                state.startTime = Date.now();
+                
+                document.getElementById('score-display').innerText = "0";
                 document.getElementById('timer-display').innerText = state.timer + "s";
-                if(state.timer <= 0) endGame();
-            }, 1000);
-        }
+                document.getElementById('progress-display').innerText = "1/" + state.questions.length;
+                
+                show('game');
+                renderQ();
 
-        function renderQ() {
-            const q = state.questions[state.qIndex];
-            els.scenarioText.innerText = q.q;
-            document.getElementById('q-number').innerText = (state.qIndex + 1);
-            document.getElementById('progress-display').innerText = (state.qIndex + 1) + "/20";
-            document.getElementById('progress-fill').style.width = ((state.qIndex + 1) / 20 * 100) + "%";
-
-            els.optionsBox.innerHTML = '';
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn p-3 sm:p-4 rounded-lg w-full text-xs sm:text-sm font-bold flex items-start sm:items-center gap-3";
-                btn.innerHTML = `<span class="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-xs flex-shrink-0">${String.fromCharCode(65+idx)}</span> <span>${opt}</span>`;
-                btn.onclick = () => handleAnswer(idx, btn);
-                els.optionsBox.appendChild(btn);
-            });
-        }
-
-        function handleAnswer(choiceIndex, btn) {
-            const q = state.questions[state.qIndex];
-            const isCorrect = choiceIndex === q.correctIndex;
-
-            // Visual feedback
-            if(isCorrect) {
-                btn.classList.add('correct');
-                state.score += state.isHackerMode ? 2 : 1;
-                document.getElementById('score-display').innerText = state.score;
-                const popup = document.createElement('div');
-                popup.className = 'score-animation text-green-400 font-bold text-lg absolute pointer-events-none';
-                popup.innerText = '+' + (state.isHackerMode ? '2' : '1');
-                btn.parentElement.appendChild(popup);
-            } else {
-                btn.classList.add('incorrect');
-                const correctBtn = Array.from(els.optionsBox.children)[q.correctIndex];
-                correctBtn.classList.add('correct');
+                if(state.interval) clearInterval(state.interval);
+                state.interval = setInterval(() => {
+                    state.timer--;
+                    document.getElementById('timer-display').innerText = state.timer + "s";
+                    if(state.timer <= 0) endGame();
+                }, 1000);
             }
 
-            // Track answer
-            state.answers.push({
-                q: q.q,
-                userChoice: q.options[choiceIndex],
-                correctChoice: q.options[q.correctIndex],
-                isCorrect: isCorrect,
-                explanation: q.explanation
-            });
+            function renderQ() {
+                const q = state.questions[state.qIndex];
+                els.scenarioText.innerText = q.q;
+                document.getElementById('q-number').innerText = (state.qIndex + 1);
+                document.getElementById('progress-display').innerText = (state.qIndex + 1) + "/" + state.questions.length;
+                document.getElementById('progress-fill').style.width = ((state.qIndex + 1) / state.questions.length * 100) + "%";
 
-            // Disable all buttons
-            Array.from(els.optionsBox.children).forEach(btn => btn.disabled = true);
-
-            // Next question
-            setTimeout(() => {
-                state.qIndex++;
-                if(state.qIndex >= 20) endGame();
-                else renderQ();
-            }, 800);
-        }
-
-        async function endGame() {
-            clearInterval(state.interval);
-            const elapsedTime = Math.round((Date.now() - state.startTime) / 1000);
-            
-            show('result');
-            document.getElementById('final-score').innerText = state.score;
-            
-            let rank = "CIVILIAN";
-            let maxScore = state.isHackerMode ? 40 : 20;
-            let ratio = state.score / maxScore;
-            let accuracy = Math.round((state.score / maxScore) * 100);
-
-            if(ratio > 0.8) rank = state.isHackerMode ? "ELITE NETRUNNER" : "CYBER GUARDIAN";
-            else if(ratio > 0.5) rank = "SECURITY ANALYST";
-            
-            document.getElementById('score-category').innerText = rank;
-            document.getElementById('score-category').className = `text-lg sm:text-xl font-bold mb-2 ${state.isHackerMode ? 'text-red-500' : 'text-cyan-400'}`;
-            document.getElementById('score-details').innerText = `${accuracy}% Accuracy • ${elapsedTime}s • ${state.isHackerMode ? 'HACKER MODE' : 'STANDARD MODE'}`;
-
-            await supabase.from('scores').insert({ username: state.username, score: state.score, category: rank, accuracy: accuracy, mode: state.isHackerMode ? 'hacker' : 'standard' });
-            
-            // Analyze performance
-            const weakAreas = state.answers.filter(a => !a.isCorrect).map(a => a.q);
-            const strengths = state.answers.filter(a => a.isCorrect).length;
-
-            state.chatContext = [
-                { role: "system", content: `You are TechAura, a cybersecurity expert AI. User ${state.username} completed 20 security scenarios in ${state.isHackerMode ? 'Hacker' : 'Standard'} mode. Score: ${state.score}/${maxScore} (${accuracy}% accuracy). Rank: ${rank}. Time: ${elapsedTime}s.
-
-PERFORMANCE DATA:
-- Correct Answers: ${strengths}/20
-- Accuracy: ${accuracy}%
-- Mode: ${state.isHackerMode ? 'HACKER' : 'STANDARD'}
-
-Provide a detailed analysis:
-1. Overall Performance Summary (1-2 sentences)
-2. Key Strengths (what they got right)
-3. Areas for Improvement (what they got wrong)
-4. Specific Recommendations (actionable advice)
-
-Keep responses concise but insightful. Be encouraging but honest.` }
-            ];
-            
-            addChatBubble(`🎯 Analyzing your ${state.isHackerMode ? 'HACKER MODE' : 'STANDARD'} performance...`, 'bot');
-            
-            // Get AI analysis
-            await getInitialAnalysis();
-        }
-
-        async function getInitialAnalysis() {
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: { 
-                        "Authorization": `Bearer ${state.groqKey}`, 
-                        "Content-Type": "application/json" 
-                    },
-                    body: JSON.stringify({ 
-                        messages: state.chatContext, 
-                        model: "llama-3.3-70b-versatile",
-                        temperature: 0.7,
-                        max_tokens: 600
-                    })
+                els.optionsBox.innerHTML = '';
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn p-3 sm:p-4 rounded-lg w-full text-xs sm:text-sm font-bold flex items-start sm:items-center gap-3";
+                    btn.innerHTML = `<span class="bg-white/10 w-6 h-6 rounded flex items-center justify-center text-xs flex-shrink-0">${String.fromCharCode(65+idx)}</span> <span>${opt}</span>`;
+                    btn.onclick = () => handleAnswer(idx, btn);
+                    els.optionsBox.appendChild(btn);
                 });
-                const json = await res.json();
-                const reply = json.choices[0].message.content;
+            }
+
+            function handleAnswer(choiceIndex, btn) {
+                const q = state.questions[state.qIndex];
+                const isCorrect = choiceIndex === q.correctIndex;
+
+                if(isCorrect) {
+                    btn.classList.add('correct');
+                    state.score += state.isHackerMode ? 2 : 1;
+                    document.getElementById('score-display').innerText = state.score;
+                } else {
+                    btn.classList.add('incorrect');
+                    const correctBtn = Array.from(els.optionsBox.children)[q.correctIndex];
+                    if(correctBtn) correctBtn.classList.add('correct');
+                }
+
+                state.answers.push({
+                    q: q.q,
+                    userChoice: q.options[choiceIndex],
+                    correctChoice: q.options[q.correctIndex],
+                    isCorrect: isCorrect,
+                    explanation: q.explanation
+                });
+
+                Array.from(els.optionsBox.children).forEach(btn => btn.disabled = true);
+
+                setTimeout(() => {
+                    state.qIndex++;
+                    if(state.qIndex >= state.questions.length) endGame();
+                    else renderQ();
+                }, 800);
+            }
+
+            async function endGame() {
+                clearInterval(state.interval);
+                const elapsedTime = Math.round((Date.now() - state.startTime) / 1000);
                 
-                // Remove initial message
+                show('result');
+                document.getElementById('final-score').innerText = state.score;
+                
+                let rank = "CIVILIAN";
+                let maxScore = state.questions.length * (state.isHackerMode ? 2 : 1);
+                let ratio = state.score / maxScore;
+                let accuracy = Math.round((state.score / maxScore) * 100);
+
+                if(ratio > 0.8) rank = state.isHackerMode ? "ELITE NETRUNNER" : "CYBER GUARDIAN";
+                else if(ratio > 0.5) rank = "SECURITY ANALYST";
+                
+                document.getElementById('score-category').innerText = rank;
+                document.getElementById('score-category').className = `text-lg sm:text-xl font-bold mb-2 ${state.isHackerMode ? 'text-red-500' : 'text-cyan-400'}`;
+                document.getElementById('score-details').innerText = `${accuracy}% Accuracy • ${elapsedTime}s • ${state.isHackerMode ? 'HACKER MODE' : 'STANDARD MODE'}`;
+
+                if(supabase) {
+                    try {
+                        await supabase.from('scores').insert({ username: state.username, score: state.score, category: rank, accuracy: accuracy, mode: state.isHackerMode ? 'hacker' : 'standard' });
+                    } catch(e) { console.log("Could not save score"); }
+                }
+
+                state.chatContext = [
+                    { role: "system", content: `You are TechAura. User ${state.username} scored ${state.score}/${maxScore} (${accuracy}%). Rank: ${rank}. Be concise.` }
+                ];
+                
+                addChatBubble(`🎯 Analysis complete. Rank: ${rank}`, 'bot');
+                getInitialAnalysis();
+            }
+
+            async function getInitialAnalysis() {
+                try {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${state.groqKey}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ messages: state.chatContext, model: "llama-3.3-70b-versatile", max_tokens: 300 })
+                    });
+                    const json = await res.json();
+                    const reply = json.choices[0].message.content;
+                    
+                    const history = document.getElementById('chat-history');
+                    if(history.lastChild) history.lastChild.remove();
+                    
+                    addChatBubble(reply, 'bot');
+                    state.chatContext.push({ role: "assistant", content: reply });
+                } catch(e) { addChatBubble("Analysis failed. Check connection.", 'bot'); }
+            }
+
+            window.sendChatMessage = async function() {
+                const input = document.getElementById('chat-input');
+                const txt = input.value.trim();
+                if(!txt) return;
+
+                addChatBubble(txt, 'user');
+                input.value = '';
+                state.chatContext.push({ role: "user", content: txt });
+
+                const load = addChatBubble("...", 'bot');
+                try {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${state.groqKey}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ messages: state.chatContext, model: "llama-3.3-70b-versatile", max_tokens: 300 })
+                    });
+                    const json = await res.json();
+                    load.remove();
+                    addChatBubble(json.choices[0].message.content, 'bot');
+                } catch(e) { load.innerText = "Error."; }
+            }
+
+            function addChatBubble(txt, sender) {
                 const history = document.getElementById('chat-history');
-                if(history.lastChild) history.lastChild.remove();
-                
-                addChatBubble(reply, 'bot');
-                state.chatContext.push({ role: "assistant", content: reply });
-            } catch(e) { 
-                console.error("Analysis error:", e);
-                addChatBubble("Unable to load analysis. Try asking me about specific scenarios.", 'bot');
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-lg max-w-[95%] sm:max-w-[85%] text-xs sm:text-sm ${sender === 'user' ? 'bg-white/10 ml-auto' : 'bg-black/40 border border-white/5 mr-auto'}`;
+                div.innerText = txt;
+                history.appendChild(div);
+                history.scrollTop = history.scrollHeight;
+                return div;
             }
-        }
 
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const txt = input.value.trim();
-            if(!txt) return;
-
-            addChatBubble(txt, 'user');
-            input.value = '';
-            state.chatContext.push({ role: "user", content: txt });
-
-            const load = addChatBubble("...", 'bot');
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: { 
-                        "Authorization": `Bearer ${state.groqKey}`, 
-                        "Content-Type": "application/json" 
-                    },
-                    body: JSON.stringify({ 
-                        messages: state.chatContext, 
-                        model: "llama-3.3-70b-versatile",
-                        temperature: 0.7,
-                        max_tokens: 500
-                    })
-                });
-                const json = await res.json();
-                const reply = json.choices[0].message.content;
-                load.remove();
-                addChatBubble(reply, 'bot');
-                state.chatContext.push({ role: "assistant", content: reply });
-            } catch(e) { 
-                load.innerText = "Connection lost."; 
-                console.error("Chat error:", e);
-            }
-        }
-
-        function addChatBubble(txt, sender) {
-            const history = document.getElementById('chat-history');
-            const div = document.createElement('div');
-            div.className = `p-3 rounded-lg max-w-[95%] sm:max-w-[85%] text-xs sm:text-sm ${sender === 'user' ? 'bg-white/10 ml-auto' : 'bg-black/40 border border-white/5 mr-auto'}`;
-            div.innerText = txt;
-            history.appendChild(div);
-            history.scrollTop = history.scrollHeight;
-            return div;
-        }
-
-        function resetGame() { show('home'); }
-        document.getElementById('chat-input').addEventListener('keypress', (e) => { if(e.key==='Enter') sendChatMessage() });
+            window.resetGame = function() { show('home'); }
+            document.getElementById('chat-input').addEventListener('keypress', (e) => { if(e.key==='Enter') sendChatMessage() });
+        });
     </script>
 </body>
 </html>
